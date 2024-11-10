@@ -1,0 +1,43 @@
+package com.example.aopdemo;
+
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public class Account
+
+{
+    private String name;
+    private String level;
+
+    public Account(){}
+
+    public Account(String name, String level) {
+        this.name = name;
+        this.level = level;
+    }
+
+    public String getLevel() {
+        return level;
+    }
+
+    public void setLevel(String level) {
+        this.level = level;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "Account{" +
+                "name='" + name + '\'' +
+                ", level='" + level + '\'' +
+                '}';
+    }
+}
