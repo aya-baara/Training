@@ -26,7 +26,13 @@ public class Task {
     @Column(name = "description")
     private String description;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @Column(name = "start_date")
+    private LocalDate startDate;
+
+    @Column(name = "end_date")
+    private LocalDate endDate;
+
+    @ManyToOne
     @JoinColumn(name="user_id")
     @JsonIgnore
     private User user;
@@ -39,6 +45,15 @@ public class Task {
         this.priority = priority;
         this.deadLine = deadLine;
         this.description = description;
+    }
+
+    public Task(String name, String priority, LocalDate deadLine, String description, LocalDate startDate, LocalDate endDate) {
+        this.name = name;
+        this.priority = priority;
+        this.deadLine = deadLine;
+        this.description = description;
+        this.endDate = endDate;
+        this.startDate = startDate;
     }
 
     public int getId() {
@@ -87,6 +102,22 @@ public class Task {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 
     @Override

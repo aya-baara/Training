@@ -38,9 +38,13 @@ public class User implements UserDetails {
     @Column(name = "status")
     private String status;
 
+    @Column(name = "role")
+    private String role;
+
     //Generate The relationships
-    @OneToMany(mappedBy="user",
-            cascade= { CascadeType.REMOVE})
+
+    @OneToMany(mappedBy="user", fetch = FetchType.EAGER,
+            cascade= { CascadeType.REMOVE,})
     private List<Task> tasks;
 
 
@@ -58,6 +62,14 @@ public class User implements UserDetails {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public int getId() {

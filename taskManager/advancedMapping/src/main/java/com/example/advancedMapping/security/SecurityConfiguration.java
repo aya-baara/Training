@@ -36,7 +36,7 @@ public class SecurityConfiguration  {
         http
                 .csrf(csrfConfigurer -> csrfConfigurer.disable())  // Updated syntax to disable CSRF
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/login", "/register").permitAll()
+                        .requestMatchers("/login").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))

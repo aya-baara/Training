@@ -7,5 +7,6 @@ import java.util.Optional;
 
 public interface TokenRepository  extends JpaRepository<Tokens,String> {
     @Transactional
-    void deleteAllByUserId(Long userId);
+    void deleteAllByUserId(int userId);
+    Optional<Tokens> findByJwtToken(String token);
 }
