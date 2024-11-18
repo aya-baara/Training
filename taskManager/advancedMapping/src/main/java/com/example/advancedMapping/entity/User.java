@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -62,6 +63,26 @@ public class User implements UserDetails {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+    }
+
+    public User(int id, String username, String firstName, String lastName, String email,String password) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        this.password=encoder.encode(password);
+        this.id = id;
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+    }
+    public User(int id, String username, String firstName, String lastName, String email,String password,String role) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        this.password=encoder.encode(password);
+        this.id = id;
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.role=role;
     }
 
     public String getRole() {

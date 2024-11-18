@@ -12,6 +12,7 @@ import com.example.advancedMapping.models.AuthenticationResponse;
 import com.example.advancedMapping.security.JWTSecurity.JwtUtil;
 import com.example.advancedMapping.security.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -100,8 +101,9 @@ public class UserServiceImplementation {
         User requestingUser= (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if(user.getId()!= requestingUser.getId()){
-            /// throw exception
             System.out.println("here");
+            throw new AccessDeniedException("you can only edit your tasks");
+
 
         }
         user.setPassword(encoder.encode(user.getPassword()));

@@ -75,7 +75,6 @@ public class TaskServiceImplementation  {
 
     public void delete(int id) throws AccessDeniedException {
         Task result=taskRepository.findById(id);
-        System.out.println(result);
         if (result!=null) {
             User requestingUser= (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             if(requestingUser.getId()!=result.getUser().getId()){
@@ -112,8 +111,7 @@ public class TaskServiceImplementation  {
                 user.getId(), task.getStartDate(), task.getEndDate());
 
         int count = tasks.size();
-        System.out.println("<<<>>>> user id " +user.getId());
-        System.out.println("<<<>>>> count " +count);
+
         if (count > 1) {
             throw new NotAllowedData("invalid Date");
         } else if (count == 1) {
