@@ -1,47 +1,33 @@
 package com.example.advancedMapping.controller;
-
 import com.example.advancedMapping.DAO.UserRepository;
-import com.example.advancedMapping.exception.AlreadyExistException;
-import com.example.advancedMapping.exception.NotAllowedData;
 import com.example.advancedMapping.models.AuthenticationRequest;
 import com.example.advancedMapping.models.AuthenticationResponse;
-
 import com.example.advancedMapping.entity.User;
 import com.example.advancedMapping.service.UserServiceImplementation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
 import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Optional;
 
+
 @RestController
-//@RequestMapping("/api")
 public class UserController {
     private UserServiceImplementation userServiceImplementation;
-    private UserRepository userRepository;
 
     @Autowired
-    public UserController(UserServiceImplementation userServiceImplementation,
-                          UserRepository userRepository){
+    public UserController(UserServiceImplementation userServiceImplementation){
         this.userServiceImplementation=userServiceImplementation;
-        this.userRepository=userRepository;
     }
 
     @GetMapping("/AllUsers")
     public List<User> getAllUsers() throws AccessDeniedException {
-        User user=(User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        System.out.println("Role = " +user.getRole());
-        if(!user.getRole().equalsIgnoreCase("admin")){
-            throw new AccessDeniedException("Only admins can access this");
-        }
 
-        return userRepository.findAll();
+
+        return userServiceImplementation.findAllUsers();
     }
 
 
@@ -71,11 +57,7 @@ public class UserController {
     //Adding Post Mapping to add new user
     @PostMapping("/register")
     public User createNewUser(@RequestBody User newUser) throws AccessDeniedException {
-        User user=(User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        System.out.println("Role = " +user.getRole());
-        if(!user.getRole().equalsIgnoreCase("admin")){
-            throw new AccessDeniedException("Only admins can add users");
-        }
+
         return userServiceImplementation.addUser(newUser);
     }
 
@@ -94,15 +76,13 @@ public class UserController {
             System.out.println("Token is " + token);
 
             boolean isLoggedOut = userServiceImplementation.invalidateToken(token);
-            if (isLoggedOut) {
-                return ResponseEntity.ok("Logged out successfully.");
-            } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid token.");
-            }
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Authorization header is missing or invalid.");
+            return ResponseEntity.ok("Logged out successfully.");
         }
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Authorization header is missing or invalid.");
+
     }
+
 
     @PostMapping("/logoutAll")
     public ResponseEntity<String> logoutAll(@RequestHeader("Authorization") String authorizationHeader) {

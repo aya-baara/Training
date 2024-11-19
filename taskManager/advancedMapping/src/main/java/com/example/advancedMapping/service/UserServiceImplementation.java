@@ -118,6 +118,11 @@ public class UserServiceImplementation {
 
     @Transactional
     public User addUser(User newUser){
+        User user=(User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        System.out.println("Role = " +user.getRole());
+        if(!user.getRole().equalsIgnoreCase("admin")){
+            throw new AccessDeniedException("Only admins can add users");
+        }
         if(userRepository.findByUsername(newUser.getUsername()).isPresent()){
             throw new AlreadyExistException();
         }
@@ -163,5 +168,16 @@ public class UserServiceImplementation {
     public void invalidateTokenAll(String token) {
         User requestingUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         tokenRepository.deleteAllByUserId(requestingUser.getId());
+    }
+
+    public List<User>findAllUsers(){
+        User user=(User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        System.out.println("Role = " +user.getRole());
+        if(!user.getRole().equalsIgnoreCase("admin")){
+            throw new AccessDeniedException("Only admins can access this");
+        }
+        return  userRepository.findAll();
+
+
     }
 }
