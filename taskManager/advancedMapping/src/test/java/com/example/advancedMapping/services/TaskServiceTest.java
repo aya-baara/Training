@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -32,7 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
-
 @ExtendWith(MockitoExtension.class)
     public class TaskServiceTest {
         @Mock
@@ -41,12 +41,12 @@ import static org.mockito.Mockito.*;
         private UserRepository userRepository;
         @InjectMocks
         private TaskServiceImplementation taskServiceImplementation;
+        @Mock
+        private UserServiceImplementation userServiceImplementation;
 
-    @InjectMocks
-    private UserServiceImplementation userServiceImplementation;
-
-        private final User user=new User(1,"aya","Aya","Jamal","ayabaara@gmail.com","123");
-        private final User user2=new User(3,"sama","Sama","sami","sama@gmail.com","123");        // Define the task parameters
+        private final User user=new User(1,"aya","Aya","Jamal","ayabaara@gmail.com","123","user");
+        private final User user2=new User(3,"sama","Sama","sami","sama@gmail.com","123","user");        // Define the task parameters
+        private final User admin=new User(2,"lana","Lana","Jamal","lana@gmail.com","123","admin");
 
 
         private final String taskName = "Complete Project";
@@ -58,7 +58,7 @@ import static org.mockito.Mockito.*;
 
         // Create the Task object
         private final Task task = new Task(taskName, taskPriority, taskDeadline, taskDescription, taskStartDate, taskEndDate);
-    private final Task task2 = new Task(taskName, taskPriority, taskDeadline, taskDescription, taskStartDate, taskEndDate);
+        private final Task task2 = new Task(taskName, taskPriority, taskDeadline, taskDescription, taskStartDate, taskEndDate);
 
 
 
@@ -81,6 +81,37 @@ import static org.mockito.Mockito.*;
 
             assertEquals(this.task, taskServiceImplementation.getTask(this.task.getId()));
         }
+
+    @Test
+    void getAllTasksSuccessfully() throws Exception{
+
+        SecurityContext context = Mockito.mock(SecurityContext.class);
+        Authentication authentication = Mockito.mock(Authentication.class);
+
+        when(context.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(context);
+        when(SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal()).thenReturn(this.admin);
+
+        taskServiceImplementation.findAll();
+        verify(taskRepository,times(1)).findAll();
+    }
+
+    @Test
+    void getAllTasksFailAccessDenied() throws Exception{
+
+        SecurityContext context = Mockito.mock(SecurityContext.class);
+        Authentication authentication = Mockito.mock(Authentication.class);
+
+        when(context.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(context);
+        when(SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal()).thenReturn(this.user);
+
+        // Assert
+        assertThrows(AccessDeniedException.class,
+                ()-> taskServiceImplementation.findAll());
+    }
 
     @Test
     void getTaskFailNotFoundException() throws Exception {
@@ -114,7 +145,7 @@ import static org.mockito.Mockito.*;
     }
 
     @Test
-    void addTaskPass() throws Exception {
+    void addTaskPassByUser() throws Exception {
 
         SecurityContext context = Mockito.mock(SecurityContext.class);
         Authentication authentication = Mockito.mock(Authentication.class);
@@ -131,6 +162,7 @@ import static org.mockito.Mockito.*;
         assertEquals(task, taskServiceImplementation.addTask(task));
 
     }
+    
 
     @Test
     void addTaskFail() throws Exception {

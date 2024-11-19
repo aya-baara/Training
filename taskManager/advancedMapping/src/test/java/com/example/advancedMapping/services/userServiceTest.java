@@ -48,7 +48,7 @@ public class userServiceTest {
     @InjectMocks
     private UserServiceImplementation userServiceImplementation;
 
-    User user=new User(1,"aya","Aya","Jamal","ayabaara@gmail.com","123");
+    User user=new User(1,"aya","Aya","Jamal","ayabaara@gmail.com","123","user");
     private final User admin=new User(2,"lana","Lana","Jamal","lana@gmail.com","123","admin");
 
 
@@ -90,6 +90,22 @@ public class userServiceTest {
     }
 
     @Test
+    void shouldThrowExceptionWhenUserRegister() throws Exception {
+        SecurityContext context = Mockito.mock(SecurityContext.class);
+        Authentication authentication = Mockito.mock(Authentication.class);
+
+        when(context.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(context);
+        when(SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal()).thenReturn(this.user);
+
+
+        // Assert
+        assertThrows(AccessDeniedException.class,
+                ()-> userServiceImplementation.addUser(this.user));
+    }
+
+    @Test
     void getUserInfo() throws Exception{
 
         SecurityContext context = Mockito.mock(SecurityContext.class);
@@ -102,6 +118,39 @@ public class userServiceTest {
 
         assertEquals(this.user,userServiceImplementation.getUserInfo());
     }
+
+    @Test
+    void getAllUsersSuccessfully() throws Exception{
+
+        SecurityContext context = Mockito.mock(SecurityContext.class);
+        Authentication authentication = Mockito.mock(Authentication.class);
+
+        when(context.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(context);
+        when(SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal()).thenReturn(this.admin);
+
+        userServiceImplementation.findAllUsers();
+        verify(userRepository,times(1)).findAll();
+    }
+
+    @Test
+    void getAllUsersFailAccessDenied() throws Exception{
+
+        SecurityContext context = Mockito.mock(SecurityContext.class);
+        Authentication authentication = Mockito.mock(Authentication.class);
+
+        when(context.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(context);
+        when(SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal()).thenReturn(this.user);
+
+        // Assert
+        assertThrows(AccessDeniedException.class,
+                ()-> userServiceImplementation.findAllUsers());
+    }
+
+
 
     @Test
     void updateUser() throws Exception{
