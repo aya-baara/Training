@@ -31,7 +31,12 @@ public class TaskServiceImplementation  {
         this.taskRepository=taskRepository;
         this.userServiceImplementation=userServiceImplementation;
     }
-    public List<Task> findAll() {
+    public List<Task> findAll() throws AccessDeniedException {
+        User user=(User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        System.out.println("Role = " +user.getRole());
+        if(!user.getRole().equalsIgnoreCase("admin")){
+            throw new AccessDeniedException("Only admins can access this");
+        }
         return taskRepository.findAll();
     }
 

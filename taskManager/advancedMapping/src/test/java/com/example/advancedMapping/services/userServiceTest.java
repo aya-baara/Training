@@ -49,10 +49,20 @@ public class userServiceTest {
     private UserServiceImplementation userServiceImplementation;
 
     User user=new User(1,"aya","Aya","Jamal","ayabaara@gmail.com","123");
+    private final User admin=new User(2,"lana","Lana","Jamal","lana@gmail.com","123","admin");
 
 
     @Test
     void shouldCreateNewUserSuccessfully() throws Exception {
+
+        SecurityContext context = Mockito.mock(SecurityContext.class);
+        Authentication authentication = Mockito.mock(Authentication.class);
+
+        when(context.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(context);
+        when(SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal()).thenReturn(this.admin);
+
         when(userRepository.save(user)).thenReturn(user);
 
         // Act
@@ -64,6 +74,14 @@ public class userServiceTest {
 
     @Test
     void shouldThrowExceptionWhenUserAlreadyExists() throws Exception {
+        SecurityContext context = Mockito.mock(SecurityContext.class);
+        Authentication authentication = Mockito.mock(Authentication.class);
+
+        when(context.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(context);
+        when(SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal()).thenReturn(this.admin);
+
         when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.ofNullable(user));
 
         // Assert

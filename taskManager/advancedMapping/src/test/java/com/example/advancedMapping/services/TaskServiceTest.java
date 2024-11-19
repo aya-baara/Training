@@ -46,7 +46,6 @@ import static org.mockito.Mockito.*;
     private UserServiceImplementation userServiceImplementation;
 
         private final User user=new User(1,"aya","Aya","Jamal","ayabaara@gmail.com","123");
-        private final User admin=new User(2,"lana","Lana","Jamal","lana@gmail.com","123","admin");
         private final User user2=new User(3,"sama","Sama","sami","sama@gmail.com","123");        // Define the task parameters
 
 

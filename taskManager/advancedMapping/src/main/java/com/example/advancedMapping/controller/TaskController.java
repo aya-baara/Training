@@ -32,11 +32,7 @@ public class TaskController {
 
     @GetMapping("/tasks")
     public List<Task> getAllTasks() throws AccessDeniedException {
-        User user=(User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        System.out.println("Role = " +user.getRole());
-        if(!user.getRole().equalsIgnoreCase("admin")){
-            throw new AccessDeniedException("Only admins can access this");
-        }
+
         return taskServiceImplementation.findAll();
     }
 
@@ -55,24 +51,33 @@ public class TaskController {
 
     @PostMapping("/tasks")
     public Task addTask(@RequestBody Map<String, Object> taskData) throws AccessDeniedException {
-        Task task = new Task(((String) taskData.get("name")),((String) taskData.get("priority")),
-                (LocalDate.parse((String) taskData.get("deadLine"))), ((String) taskData.get("description")),
-                (LocalDate.parse((String) taskData.get("startDate"))),(LocalDate.parse((String) taskData.get("endDate"))));
+        // Extract task details from the request body
+        Task task = new Task(
+                (String) taskData.get("name"),
+                (String) taskData.get("priority"),
+                LocalDate.parse((String) taskData.get("deadLine")),
+                (String) taskData.get("description"),
+                LocalDate.parse((String) taskData.get("startDate")),
+                LocalDate.parse((String) taskData.get("endDate"))
+        );
 
-        User user=(User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        System.out.println("Role = " +user.getRole());
+        // Extract role from the request body
+        String role = (String) taskData.get("role");
+        task.setId(0); // Ensure ID is 0 to create a new task
 
-        task.setId(0);  // Ensure ID is 0 to create a new task
-
-        if(!user.getRole().equalsIgnoreCase("admin")){
+        // Check if the role is admin
+        if ("admin".equalsIgnoreCase(role)) {
+            Integer userId = (Integer) taskData.get("userId");
+            if (userId == null) {
+                throw new IllegalArgumentException("User ID is required for admin role");
+            }
+            System.out.println("Admin User ID >>> " + userId);
+            taskServiceImplementation.addTaskByAdmin(task, userId);
+        } else {
+            // Default behavior for non-admin roles
             taskServiceImplementation.addTask(task);
         }
-        else{
-            Integer userId = (Integer) taskData.get("userId");
-            System.out.println("User Id>>> " +userId);
-            taskServiceImplementation.addTaskByAdmin(task,userId);
 
-        }
         return task;
     }
     @PatchMapping("/tasks")
