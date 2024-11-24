@@ -162,7 +162,7 @@ import static org.mockito.Mockito.*;
         assertEquals(task, taskServiceImplementation.addTask(task));
 
     }
-    
+
 
     @Test
     void addTaskFail() throws Exception {
